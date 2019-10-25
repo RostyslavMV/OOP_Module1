@@ -3,5 +3,8 @@
 class GroundVehicle :
 	public Vehicle
 {
+	void CalcualateRoadLength() override
+	{
+	}
 };
 

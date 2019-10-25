@@ -13,6 +13,14 @@ class Storage
 {
 public:
 	int id;
+	double X() 
+	{
+		return this->X;
+	}
+	double Y()
+	{
+		return this->Y;
+	}
 private:
 	double X;
 	double Y;
