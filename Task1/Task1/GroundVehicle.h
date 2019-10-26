@@ -8,5 +8,13 @@ private:
 	{
 		this->currentRoadLength = storagesSystem->GetRoadLength(start, destination);
 	}
+public:
+	GroundVehicle(Storages* storagesSystem, double maxLoadVolume, double maxLoadWeight, int velocity)
+	{
+		this->storagesSystem = storagesSystem;
+		this->maxLoadVolume = maxLoadVolume;
+		this->maxLoadWeight = maxLoadWeight;
+		this->velocity = velocity;
+	}
 };
 

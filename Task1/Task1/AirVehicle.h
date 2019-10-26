@@ -10,5 +10,12 @@ public:
 		double dY = this->start->Y() - this->destination->Y();
 		this->currentRoadLength = sqrt(dX * dX + dY * dY);
 	}
+	AirVehicle(Storages* storagesSystem, double maxLoadVolume, double maxLoadWeight, int velocity)
+	{
+		this->storagesSystem = storagesSystem;
+		this->maxLoadVolume = maxLoadVolume;
+		this->maxLoadWeight = maxLoadWeight;
+		this->velocity = velocity;
+	}
 };
 

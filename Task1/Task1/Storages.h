@@ -9,6 +9,23 @@ class Storages
 private:
 	vector<vector<double>> roadsLengths;
 	vector<vector<double>> graph;
+	void setGraph()
+	{
+		for (int i = 0; i < storages.size(); i++)
+		{
+			graph.push_back(vector<double>(storages.size() - 1, 0));
+		}
+		for (int i = 0; i < storages.size(); i++)
+		{
+			graph.push_back(vector<double>(storages.size() - 1, 0));
+			for (int j = 0; j < storages[i]->neighboringStorages.size(); j++)
+			{
+				double distance = storages[i]->neighboringStorages[j].distance;
+				int index = storages[i]->neighboringStorages[j].storage->id;
+				graph[i][index] = distance;
+			}
+		}
+	}
 	double minDistance(vector<double> dist, vector<bool> sptSet)
 	{
 		int min = DBL_MAX, min_index = 0;
@@ -29,9 +46,9 @@ public:
 	void CalculateRoadLengthes()
 	{
 		roadsLengths.resize(storages.size());
-		for (int src = 0; src < storages.size();src++)
+		for (int src = 0; src < storages.size(); src++)
 		{
-			vector<bool> sptSet; 
+			vector<bool> sptSet;
 			sptSet.resize(storages.size());
 
 			for (int i = 0; i < storages.size(); i++)
@@ -51,10 +68,19 @@ public:
 						&& roadsLengths[src][u] + graph[u][v] < roadsLengths[src][v])
 					{
 						roadsLengths[src][v] = roadsLengths[src][u] + graph[u][v];
-					}		
+					}
 				}
 			}
 		}
+	}
+	Storages(vector<Storage*>& storages)
+	{
+		this->storages = storages;
+		for (int i = 0; i < storages.size(); i++)
+		{
+			storages[i]->id = i;
+		}
+		setGraph();
 	}
 	friend class GroundVehicle;
 };

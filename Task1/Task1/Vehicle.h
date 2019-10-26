@@ -21,15 +21,17 @@ public:
 	}
 protected:
 	Storages* storagesSystem;
-	Storage* start;
-	Storage* destination;
 	double maxLoadVolume;
 	double maxLoadWeight;
+	int velocity;
+
+	Storage* start;
+	Storage* destination;
 	double currentLoadVolume;
 	double currentLoadWeight;
 	double currentRoadLength;
 	double currentRoadProgress;
-	int velocity;
+		
 	vector<Load> onboardLoads;
 	virtual void CalcualateRoadLength() = 0;
 };
