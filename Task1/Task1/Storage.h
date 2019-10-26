@@ -4,28 +4,30 @@
 
 using std::vector;
 
-struct StorageDistance
-{
-	Storage* storage;
-	double distance;
-};
 class Storage
 {
 public:
 	int id;
 	double X() 
 	{
-		return this->X;
+		return this->x;
 	}
 	double Y()
 	{
-		return this->Y;
+		return this->y;
 	}
 private:
-	double X;
-	double Y;
+	struct StorageDistance
+	{
+		Storage* storage;
+		double distance;
+	};
+	double x;
+	double y;
 	vector<StorageDistance> neighboringStorages;
-	vector<Load> unloadingLoads;
+	vector<Load*> unloadingLoads;
 	vector<int> loadingLoads;
 };
+
+
 

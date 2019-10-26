@@ -1,6 +1,7 @@
 #pragma once
 #include "Load.h"
 #include "Storage.h"
+#include "Storages.h"
 #include <vector>
 
 using std::vector;
@@ -16,8 +17,10 @@ public:
 		onboardLoads.push_back(load);
 		this->start = start;
 		this->destination = destination;
+		CalcualateRoadLength();
 	}
 protected:
+	Storages* storagesSystem;
 	Storage* start;
 	Storage* destination;
 	double maxLoadVolume;

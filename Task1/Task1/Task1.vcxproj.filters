@@ -18,6 +18,9 @@
     <ClCompile Include="Task1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Storages.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Storage.h">
@@ -33,6 +36,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GroundVehicle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Storages.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
