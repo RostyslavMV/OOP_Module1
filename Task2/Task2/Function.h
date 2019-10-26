@@ -233,7 +233,7 @@ public:
 		string buff1, buff2;
 		while (iss1 >> buff1 && iss2 >> buff2)
 		{
-			ret += buff1 + " " + buff2 + " ";
+			ret += buff2 + " " + buff1 + " ";
 		}
 		while (iss1 >> buff1)
 		{
