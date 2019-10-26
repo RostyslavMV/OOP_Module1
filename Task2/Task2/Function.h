@@ -3,12 +3,14 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <set>
 
 using std::string;
 using std::to_string;
 using std::vector;
 using std::istringstream;
 using std::pair;
+using std::set;
 
 class Function
 {
@@ -20,6 +22,7 @@ private:
 		{
 			ret += arg;
 		}
+		return ret;
 	}
 	string IntName(int a)
 	{
@@ -54,7 +57,7 @@ private:
 			ret += "nine ";
 			break;
 		}
-		ret += "hundred ";
+		if (a / 100 > 0) ret += "hundred ";
 		switch ((a % 100) / 10)
 		{
 		case 2:
@@ -168,6 +171,11 @@ public:
 			a = (argument * argument) % 117;
 		else
 			a = (IntPow(argument, 5) + IntPow(argument, 3)) % 217;
+		if (a < 0)
+		{
+			ret += "minus ";
+			a = -a;
+		}
 		int bil = a / 1000000000;
 		if (bil > 0)
 		{
@@ -188,14 +196,6 @@ public:
 		{
 			ret += IntName(rest);
 		}
-	}
-	template <>
-	string func(double argument)
-	{
-		string a, ret;
-		a = to_string(sin(argument + 317));
-		string s = a.substr(s.find('.', 2));
-		ret = IntName(((int)s.at(0) - 48) * 10 + (int)s.at(1) - 48);
 		return ret;
 	}
 	template <>
@@ -203,10 +203,11 @@ public:
 	{
 		string a, ret;
 		a = to_string(sin(argument + 317));
-		string s = a.substr(s.find('.', 2));
+		string s = a.substr(a.find('.') + 1, 2);
 		ret = IntName(((int)s.at(0) - 48) * 10 + (int)s.at(1) - 48);
 		return ret;
 	}
+
 	template <>
 	string func(string argument)
 	{
@@ -227,10 +228,10 @@ public:
 	string func(pair<T1, T2> pair)
 	{
 		string ret;
-		string s1 = func(T1), s2 = func(T2);
+		string s1 = func(pair.first), s2 = func(pair.second);
 		istringstream iss1(s1), iss2(s2);
 		string buff1, buff2;
-		while (iss1 >> buff1 && iss2 >> buf2)
+		while (iss1 >> buff1 && iss2 >> buff2)
 		{
 			ret += buff1 + " " + buff2 + " ";
 		}
@@ -246,6 +247,26 @@ public:
 			ret.erase(ret.size() - 1);
 		return ret;
 	}
-
+	template <typename T>
+	string func(vector<T> argument)
+	{
+		set<string> words;
+		string ret;
+		for (int i = 0; i < argument.size();i++)
+		{
+			string s = func(argument[i]);
+			istringstream iss(s);
+			while (iss >> s)
+				words.insert(s);
+		}
+		set<string>::iterator it;
+		for (it = words.begin(); it != words.end(); it++)
+		{
+			ret += *it + " ";
+		}
+		if (ret.at(ret.size() - 1) == ' ')
+			ret.erase(ret.size() - 1);
+		return ret;
+	}
 };
 
