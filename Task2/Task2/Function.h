@@ -8,6 +8,7 @@ using std::string;
 using std::to_string;
 using std::vector;
 using std::istringstream;
+using std::pair;
 
 class Function
 {
@@ -177,12 +178,12 @@ public:
 		{
 			ret += IntName(mil) + "millions ";
 		}
-		int th = (a - (bil * 1000000000)-(mil* 1000000)) / 1000;
+		int th = (a - (bil * 1000000000) - (mil * 1000000)) / 1000;
 		if (th > 0)
 		{
 			ret += IntName(th) + "thousands ";
 		}
-		int rest = a - (bil * 1000000000) - (mil * 1000000)-(th*1000);
+		int rest = a - (bil * 1000000000) - (mil * 1000000) - (th * 1000);
 		if (rest > 0)
 		{
 			ret += IntName(rest);
@@ -191,10 +192,10 @@ public:
 	template <>
 	string func(double argument)
 	{
-		string a ,ret;
-		a = to_string(sin(argument+317));
+		string a, ret;
+		a = to_string(sin(argument + 317));
 		string s = a.substr(s.find('.', 2));
-		ret = IntName(((int)s.at(0)-48)*10 +(int)s.at(1) - 48);
+		ret = IntName(((int)s.at(0) - 48) * 10 + (int)s.at(1) - 48);
 		return ret;
 	}
 	template <>
@@ -212,18 +213,39 @@ public:
 		string ret;
 		vector<string> words;
 		istringstream iss(argument);
-		for (string argument; iss >> argument; )
-			words.push_back(argument);
+		for (string s; iss >> s; )
+			words.push_back(s);
 		for (int i = words.size() - 1; i >= 0; i--)
 		{
-			if (i == 0)
-			{
-				ret += words[0];
-			}
-			else ret += words[i] + " ";
+			ret += words[i] + " ";
 		}
+		if (ret.at(ret.size() - 1) == ' ')
+			ret.erase(ret.size() - 1);
 		return ret;
 	}
-	
+	template <typename T1, typename T2>
+	string func(pair<T1, T2> pair)
+	{
+		string ret;
+		string s1 = func(T1), s2 = func(T2);
+		istringstream iss1(s1), iss2(s2);
+		string buff1, buff2;
+		while (iss1 >> buff1 && iss2 >> buf2)
+		{
+			ret += buff1 + " " + buff2 + " ";
+		}
+		while (iss1 >> buff1)
+		{
+			ret += buff1 + " ";
+		}
+		while (iss2 >> buff2)
+		{
+			ret += buff2 + " ";
+		}
+		if (ret.at(ret.size() - 1) == ' ')
+			ret.erase(ret.size() - 1);
+		return ret;
+	}
+
 };
 
