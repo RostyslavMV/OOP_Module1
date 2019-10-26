@@ -184,14 +184,15 @@ public:
 			ret += IntName(rest);
 		}
 	}
-	//template <>
-	/*string func(double argument)
+	template <>
+	string func(double argument)
 	{
-		string ret;
-		ret += to_string(sin(argument+317));
-		string s = to_string(argument);
-		ret += s.substr(s.find('.', 2));
+		string a ,ret;
+		a = to_string(sin(argument+317));
+		string s = a.substr(s.find('.', 2));
+		ret = IntName(((int)s.at(0)-48)*10 +(int)s.at(1) - 48);
 		return ret;
-	}*/
+	}
+	
 };
 
