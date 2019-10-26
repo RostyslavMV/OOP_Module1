@@ -6,8 +6,8 @@ class AirVehicle :
 public:
 	void CalcualateRoadLength() override
 	{
-		double dX = this->start->X() - this->destination->X();
-		double dY = this->start->Y() - this->destination->Y();
+		double dX = this->currentStart->X() - this->currentDestination->X();
+		double dY = this->currentStart->Y() - this->currentDestination->Y();
 		this->currentRoadLength = sqrt(dX * dX + dY * dY);
 	}
 	AirVehicle(Storages* storagesSystem, double maxLoadVolume, double maxLoadWeight, int velocity)

@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{8083DA4F-7E93-4E0A-BBD4-780B782F57F8}</ProjectGuid>
+    <ProjectGuid>{CF7BF4AD-A08A-41B0-A303-20295F99F176}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Task1</RootNamespace>
+    <RootNamespace>Task2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -151,15 +151,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Task1.cpp" />
+    <ClCompile Include="Task2.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AirVehicle.h" />
-    <ClInclude Include="GroundVehicle.h" />
-    <ClInclude Include="Load.h" />
-    <ClInclude Include="Storage.h" />
-    <ClInclude Include="Storages.h" />
-    <ClInclude Include="Vehicle.h" />
+    <ClInclude Include="Function.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,7 +6,7 @@ class GroundVehicle :
 private:
 	void CalcualateRoadLength() override
 	{
-		this->currentRoadLength = storagesSystem->GetRoadLength(start, destination);
+		this->currentRoadLength = storagesSystem->GetRoadLength(currentStart, currentDestination);
 	}
 public:
 	GroundVehicle(Storages* storagesSystem, double maxLoadVolume, double maxLoadWeight, int velocity)

@@ -20,8 +20,8 @@ private:
 			graph.push_back(vector<double>(storages.size() - 1, 0));
 			for (int j = 0; j < storages[i]->neighboringStorages.size(); j++)
 			{
-				double distance = storages[i]->neighboringStorages[j].distance;
-				int index = storages[i]->neighboringStorages[j].storage->id;
+				double distance = storages[i]->neighboringStorages[j]->distance;
+				int index = storages[i]->neighboringStorages[j]->storage->id;
 				graph[i][index] = distance;
 			}
 		}

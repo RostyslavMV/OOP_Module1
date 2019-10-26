@@ -4,6 +4,7 @@
 
 using std::vector;
 
+
 class Storage
 {
 public:
@@ -11,9 +12,14 @@ public:
 	{
 		Storage* storage;
 		double distance;
+		StorageDistance(Storage* storage, double distance)
+		{
+			this->storage = storage;
+			this->distance = distance;
+		}
 	};
 	int id;
-	vector<StorageDistance> neighboringStorages;
+	vector<StorageDistance*> neighboringStorages;
 	double X() 
 	{
 		return this->x;
@@ -22,16 +28,8 @@ public:
 	{
 		return this->y;
 	}
-private:
-	static vector<StorageDistance> DEFAULT_VECTOR;
-	double x;
-	double y;
-	vector<Load*> spawningLoads;
-	int spawnPeriod;
-	vector<Load*> unloadingLoads;
-	vector<int> loadingLoads;
-	Storage(vector<int>& loadingLoads, vector<Load*>& unloadingLoads, vector<Load*>& spawningLoads,
-		int spawnPeriod, vector<StorageDistance>& neighboringStorages = DEFAULT_VECTOR)
+	Storage(vector<int>& loadingLoads, vector<StorageDistance*>& neighboringStorages = DEFAULT_VECTOR_SD,
+		vector<Load*>& unloadingLoads = DEFAULT_VECTOR_L, vector<Load*>& spawningLoads = DEFAULT_VECTOR_L, int spawnPeriod = -1)
 	{
 		this->loadingLoads = loadingLoads;
 		this->unloadingLoads = unloadingLoads;
@@ -39,6 +37,15 @@ private:
 		this->spawnPeriod = spawnPeriod;
 		this->neighboringStorages = neighboringStorages;
 	}
+private:
+	static vector<StorageDistance*> DEFAULT_VECTOR_SD;
+	static vector<Load*> DEFAULT_VECTOR_L;
+	double x;
+	double y;
+	vector<Load*> spawningLoads;
+	int spawnPeriod;
+	vector<Load*> unloadingLoads;
+	vector<int> loadingLoads;
 };
 
 
