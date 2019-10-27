@@ -17,8 +17,6 @@ public:
 class Storage
 {
 private:
-	//static vector<StorageDistance*> DEFAULT_VECTOR_SD;
-	//static vector<Load*> DEFAULT_VECTOR_L;
 	double x;
 	double y;
 	int id;

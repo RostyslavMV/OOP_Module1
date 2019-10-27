@@ -7,11 +7,11 @@ Load::Load(int type, double volume, double weight)
 	this->weight = weight;
 }
 
-PeriodicalLoad::PeriodicalLoad(Load* _load, int _period, int _increase)
+PeriodicalLoad::PeriodicalLoad(Load* load, int period, int increase)
 {
-	load = _load;
-	period = _period;
-	increase = _increase;
-	nextTime = _period;
-	quantity = _increase;
+	this->load = load;
+	this->period = period;
+	this->increase = increase;
+	this->nextTime = period;
+	this->quantity = increase;
 }

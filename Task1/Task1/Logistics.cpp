@@ -3,7 +3,11 @@
 #include <sstream>
 #include <iostream>
 
-std::string getVal(std::string s, const char* key) {
+using std::string;
+using std::cout;
+using std::vector;
+
+string getVal(string s, const char* key) {
 	int p1 = s.find(key, 0);
 	p1 = s.find("=", p1);
 	p1++;
@@ -12,14 +16,14 @@ std::string getVal(std::string s, const char* key) {
 	return s.substr(p1, p2 - p1);
 }
 
-int getInt(std::string s, const char* key) {
-	std::string ss = getVal(s, key);
+int getInt(string s, const char* key) {
+	string ss = getVal(s, key);
 	int ret = std::stoi(ss);
 	return ret;
 }
 
-double getDbl(std::string s, const char* key) {
-	std::string ss = getVal(s, key);
+double getDbl(string s, const char* key) {
+	string ss = getVal(s, key);
 	int ret = std::stof(ss);
 	return ret;
 }
@@ -37,7 +41,7 @@ Storage* Logistics::storage(int id)
 
 Load* Logistics::load(int type)
 {
-	std::vector<Load*>::iterator it;
+	vector<Load*>::iterator it;
 	for (it = loads.begin(); it != loads.end(); it++)
 	{
 		if ((*it)->type == type)
@@ -49,7 +53,7 @@ Load* Logistics::load(int type)
 void Logistics::load(const char* fName)
 {
 	std::ifstream file(fName);
-	std::string s;
+	string s;
 	int prev = 0, pos = 0;
 	while (std::getline(file, s))
 	{
@@ -69,9 +73,9 @@ void Logistics::load(const char* fName)
 			Storage* stA = storage(a);
 			Storage* stB = storage(b);
 			if (stA == nullptr)
-				std::cout << "storage " << a << " not found";
+				cout << "storage " << a << " not found";
 			else if (stB == nullptr)
-				std::cout << "storage " << b << " not found";
+				cout << "storage " << b << " not found";
 			else
 			{
 				stA->addNeighbor(stB, l);
@@ -94,9 +98,9 @@ void Logistics::load(const char* fName)
 			Storage* st = storage(_s);
 			Load* ld = load(l);
 			if (st == nullptr)
-				std::cout << "inload: storage " << st << " not found";
+				cout << "inload: storage " << st << " not found";
 			else if (ld == nullptr)
-				std::cout << "inload: load " << l << " not found";
+				cout << "inload: load " << l << " not found";
 			else
 			{
 				st->addInLoad(ld, p, q);
@@ -111,9 +115,9 @@ void Logistics::load(const char* fName)
 			Storage* st = storage(_s);
 			Load* ld = load(l);
 			if (st == nullptr)
-				std::cout << "outload: storage " << st << " not found";
+				cout << "outload: storage " << st << " not found";
 			else if (ld == nullptr)
-				std::cout << "outload: load " << l << " not found";
+				cout << "outload: load " << l << " not found";
 			else
 			{
 				st->addOutLoad(ld, p, q);
@@ -125,5 +129,5 @@ void Logistics::load(const char* fName)
 
 void Logistics::simulate(int endTime)
 {
-	std::cout << "todo";
+	cout << "todo";
 }

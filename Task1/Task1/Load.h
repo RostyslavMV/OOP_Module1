@@ -13,7 +13,7 @@ class PeriodicalLoad {
 	int increase;
 	int quantity = 0;
 public:
-	PeriodicalLoad(Load* _load, int _period, int _increase);
+	PeriodicalLoad(Load* load, int period, int increase);
 	int period;
 	Load* load;
 	int nextTime;

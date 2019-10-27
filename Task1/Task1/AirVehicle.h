@@ -4,7 +4,7 @@ class AirVehicle :
 	public Vehicle
 {
 public:
-	void CalcualateRoadLength() override
+	/*void CalcualateRoadLength() override
 	{
 		double dX = this->currentStart->X() - this->currentDestination->X();
 		double dY = this->currentStart->Y() - this->currentDestination->Y();
@@ -16,6 +16,6 @@ public:
 		this->maxLoadVolume = maxLoadVolume;
 		this->maxLoadWeight = maxLoadWeight;
 		this->velocity = velocity;
-	}
+	}*/
 };
 
