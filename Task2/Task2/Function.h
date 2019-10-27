@@ -173,8 +173,7 @@ public:
 			a = (IntPow(argument, 5) + IntPow(argument, 3)) % 217;
 		if (a < 0)
 		{
-			ret += "minus ";
-			a = -a;
+			a += 217;
 		}
 		int bil = a / 1000000000;
 		if (bil > 0)
@@ -252,7 +251,7 @@ public:
 	{
 		set<string> words;
 		string ret;
-		for (int i = 0; i < argument.size();i++)
+		for (int i = 0; i < argument.size(); i++)
 		{
 			string s = func(argument[i]);
 			istringstream iss(s);
