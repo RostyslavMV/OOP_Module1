@@ -18,6 +18,12 @@
     <ClCompile Include="Task1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Storage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Load.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Storage.h">

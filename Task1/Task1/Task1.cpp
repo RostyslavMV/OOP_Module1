@@ -6,7 +6,7 @@
 
 int main()
 {
-	vector<int> loadingLoads1 = { 1,2,4 };
+	/*vector<int> loadingLoads1 = { 1,2,4 };
 	vector<int> loadingLoads2 = { 0,3,4 };
 	vector<int> loadingLoads3 = { 0,2,3 };
 	Load load0(0, 7, 2);
@@ -36,7 +36,7 @@ int main()
 	storage1 = new Storage(loadingLoads3, neighboringStorages4, unloadingLoads3, spawningLoads3, 20);
 
 	vector<Storage*> storageVec;
-
+*/
 	//storageVec.push_back();
 	//Storages ukrainianStorages;
 }
