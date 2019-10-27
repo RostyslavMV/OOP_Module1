@@ -24,6 +24,9 @@
     <ClCompile Include="Load.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Logistics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Storage.h">
@@ -41,7 +44,7 @@
     <ClInclude Include="GroundVehicle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Storages.h">
+    <ClInclude Include="Logistics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

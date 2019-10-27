@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Load.cpp" />
+    <ClCompile Include="Logistics.cpp" />
     <ClCompile Include="Storage.cpp" />
     <ClCompile Include="Task1.cpp" />
   </ItemGroup>
@@ -159,8 +160,8 @@
     <ClInclude Include="AirVehicle.h" />
     <ClInclude Include="GroundVehicle.h" />
     <ClInclude Include="Load.h" />
+    <ClInclude Include="Logistics.h" />
     <ClInclude Include="Storage.h" />
-    <ClInclude Include="Storages.h" />
     <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
