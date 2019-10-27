@@ -1,4 +1,3 @@
-#include "Storages.h"
 #include "AirVehicle.h"
 #include "GroundVehicle.h"
 #include <iostream>

@@ -1,0 +1,34 @@
+storage id=1; x=1; y=4
+storage id=2; x=3; y=4
+storage id=3; x=2; y=3
+storage id=4; x=5; y=2
+storage id=5; x=7; y=3
+storage id=6; x=8; y=2
+storage id=7; x=7; y=1
+
+road a=1;b=2;l=2
+road a=1;b=3;l=2
+road a=2;b=3;l=2
+road a=2;b=4;l=4
+road a=2;b=5;l=5
+road a=4;b=5;l=5
+road a=5;b=6;l=2
+road a=5;b=7;l=2
+road a=6;b=7;l=2
+
+load t=1; w=2; v=6;
+load t=2; w=3; v=5;
+load t=3; w=4; v=4;
+#load t=4; w=5; v=3;
+#load t=5; w=6; v=2;
+
+#inload storage s; period p; quantity q
+inload l=1; s=1; p=2; q=3
+outload l=1; s=2; p=4; q=1;
+outload l=1; s=6; p=4; q=2;
+inload l=2; s=2; p=5; q=8
+outload l=2; s=4; p=2; q=2;
+outload l=2; s=7; p=3; q=5;
+inload l=3; s=2; p=3; q=8
+inload l=3; s=4; p=3; q=7
+outload l=3; s=7; p=4; q=5;
