@@ -7,7 +7,7 @@ using std::endl;
 int main()
 {
 	Function f;
-	cout << "f(int =5) = " << f.func(5) << endl;
+	cout << "f(int =115) = " << f.func(115) << endl;
 	cout << "f(int = -57) = " << f.func(-57) << endl;
 	cout << "f(double = 5.7) = " << f.func(5.7) << endl;
 	string s = "ass bsd bhs bb asdas   k bsa bbb bk   b";

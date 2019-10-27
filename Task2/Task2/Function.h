@@ -17,10 +17,10 @@ class Function
 private:
 	int IntPow(int arg, int pow)
 	{
-		int ret = 0;
-		for (int i = 1; i < pow; i++)
+		int ret = 1;
+		for (int i = 1; i <= pow; i++)
 		{
-			ret += arg;
+			ret *= arg;
 		}
 		return ret;
 	}
