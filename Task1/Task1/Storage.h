@@ -22,7 +22,6 @@ public:
 
 class Storage
 {
-private:
 	double x;
 	double y;
 	int id;
@@ -31,12 +30,16 @@ public:
 	int Id() { return id; };
 	double X() { return this->x; }
 	double Y() { return this->y; }
+	void addNeighbor(Storage* storage, double distance);
+
+	int nextInLoadTime = -1;
 	vector<Neighbor*> neighbores;
 	vector<PeriodicalLoad*> inLoads;
 	vector<PeriodicalLoad*> outLoads;
-	void addNeighbor(Storage* storage, double distance);
+
 	void addInLoad(Load* load, int period, int quantity);
 	void addOutLoad(Load* load, int period, int quantity);
+	bool canOutload(Load* load, int time);
 };
 
 

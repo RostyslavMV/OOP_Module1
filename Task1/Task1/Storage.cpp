@@ -23,3 +23,21 @@ void Storage::addOutLoad(Load* load, int period, int quantity)
 {
 	outLoads.push_back(new PeriodicalLoad(load, period, quantity));
 }
+
+bool Storage::canOutload(Load* load, int time)
+{
+	for (PeriodicalLoad* pl : outLoads)
+	{
+		if (pl->load == load)
+		{
+			while (pl->nextTime <= time)
+			{
+				pl->quantity += pl->increase;
+				pl->nextTime += pl->period;
+			}
+			if (pl->quantity > 0)
+				return true;
+		}
+	}
+	return false;
+}
