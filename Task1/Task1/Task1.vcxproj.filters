@@ -41,12 +41,6 @@
     <ClInclude Include="Vehicle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AirVehicle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GroundVehicle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Logistics.h">
       <Filter>Header Files</Filter>
     </ClInclude>

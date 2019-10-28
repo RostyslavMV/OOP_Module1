@@ -1,4 +1,5 @@
 #include "Logistics.h"
+#include "Vehicle.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -50,6 +51,57 @@ Load* Logistics::load(int type)
 	return nullptr;
 }
 
+void Logistics::setGraph()
+{
+	graph.clear();
+	for (int i = 0; i < storages.size(); i++)
+	{
+		graph.push_back(vector<double>(storages.size(), 0));
+		minDistances.push_back(vector<double>(storages.size(), 0));
+	}
+	for (int i = 0; i < storages.size(); i++)
+	{
+		for (int j = 0; j < storages[i]->neighbores.size(); j++)
+		{
+			double distance = storages[i]->neighbores[j]->Distance();
+			int index = storages[i]->neighbores[j]->Storage()->Id();
+			graph[i][index] = distance;
+		}
+	}
+}
+
+double Logistics::minDistance(vector<double>& dist, vector<bool>& sptSet)
+{
+	double min = DBL_MAX, minIndex;
+	for (int v = 0; v < dist.size(); v++)
+		if (sptSet[v] == false && dist[v] <= min)
+			min = dist[v], minIndex = v;
+	return minIndex;
+}
+
+void Logistics::dijkstra()
+{
+	setGraph();
+	for (int src = 0; src < storages.size(); src++)
+	{
+		vector<bool> sptSet;
+		sptSet.resize(graph.size());
+		for (int i = 0; i < graph.size(); i++)
+			minDistances[src][i] = DBL_MAX, sptSet[i] = false;
+		minDistances[src][src] = 0;
+		for (int count = 0; count < graph.size() - 1; count++)
+		{
+			int u = minDistance(minDistances[src], sptSet);
+			sptSet[u] = true;
+			for (int v = 0; v < graph.size(); v++)
+				if (!sptSet[v] && graph[u][v] && minDistances[src][u] != DBL_MAX
+					&& minDistances[src][u] + graph[u][v] < minDistances[src][v])
+					minDistances[src][v] = minDistances[src][u] + graph[u][v];
+		}
+	}
+}
+
+
 void Logistics::load(const char* fName)
 {
 	std::ifstream file(fName);
@@ -59,10 +111,9 @@ void Logistics::load(const char* fName)
 	{
 		if (s.rfind("storage", 0) == 0)
 		{
-			int id = getInt(s, "id");
 			double x = getDbl(s, "x");
 			double y = getDbl(s, "y");
-			Storage* storage = new Storage(id, x, y);
+			Storage* storage = new Storage(x, y);
 			storages.push_back(storage);
 		}
 		else if (s.rfind("road", 0) == 0)
@@ -73,9 +124,9 @@ void Logistics::load(const char* fName)
 			Storage* stA = storage(a);
 			Storage* stB = storage(b);
 			if (stA == nullptr)
-				cout << "storage " << a << " not found";
+				cout << "storage " << a << " not found\n";
 			else if (stB == nullptr)
-				cout << "storage " << b << " not found";
+				cout << "storage " << b << " not found\n";
 			else
 			{
 				stA->addNeighbor(stB, l);
@@ -98,9 +149,9 @@ void Logistics::load(const char* fName)
 			Storage* st = storage(_s);
 			Load* ld = load(l);
 			if (st == nullptr)
-				cout << "inload: storage " << st << " not found";
+				cout << "inload: storage " << st << " not found\n";
 			else if (ld == nullptr)
-				cout << "inload: load " << l << " not found";
+				cout << "inload: load " << l << " not found\n";
 			else
 			{
 				st->addInLoad(ld, p, q);
@@ -115,19 +166,80 @@ void Logistics::load(const char* fName)
 			Storage* st = storage(_s);
 			Load* ld = load(l);
 			if (st == nullptr)
-				cout << "outload: storage " << st << " not found";
+				cout << "outload: storage " << st << " not found\n";
 			else if (ld == nullptr)
-				cout << "outload: load " << l << " not found";
+				cout << "outload: load " << l << " not found\n";
 			else
 			{
 				st->addOutLoad(ld, p, q);
 			}
 		}
+		else if (s.rfind("airvehicle", 0) == 0)
+		{
+			double v = getDbl(s, "v");
+			double w = getDbl(s, "w");
+			double sp = getDbl(s, "sp");
+			int st = getInt(s, "st");
+			int lt = getInt(s, "lt");
+			int ut = getInt(s, "ut");
+			Storage* str = storage(st);
+			if (str == nullptr)
+				cout << "outload: storage " << st << " not found\n";
+			else
+				vehicles.push_back(new Vehicle(v, w, sp, str, lt, ut, true));
+		}
+		else if (s.rfind("groundvehicle", 0) == 0)
+		{
+			double v = getDbl(s, "v");
+			double w = getDbl(s, "w");
+			int sp = getInt(s, "sp");
+			int st = getInt(s, "st");
+			int lt = getInt(s, "lt");
+			int ut = getInt(s, "ut");
+			Storage* str = storage(st);
+			if (str == nullptr)
+				cout << "outload: storage " << st << " not found\n";
+			else
+			{
+				vehicles.push_back(new Vehicle(v, w, sp, str, lt, ut, false));
+			}
+		}
 	}
 	file.close();
+	dijkstra();
 }
 
 void Logistics::simulate(int endTime)
 {
-	cout << "todo";
+	vector<Storage*>::iterator stIt;
+	vector<PeriodicalLoad*>::iterator inloadIt;
+	int time = 0;
+	int nextTimeIter = endTime;
+	// Ітерації
+	while (nextTimeIter < endTime)
+	{
+		// Проходимо по всіх складах
+		for (stIt = storages.begin(); stIt != storages.end(); stIt++)
+		{
+			Storage* st = *stIt;
+			// Всі вантажі які потрібно привести
+			for (inloadIt = st->inLoads.begin(); inloadIt != st->inLoads.end(); stIt++)
+			{
+				PeriodicalLoad* pl = *inloadIt;
+				while (pl->quantity != 0)
+				{
+					Storage* source = priorityStorage(pl->load);
+					if (source == nullptr) break; // Немає де взяти товар
+					Vehicle* vehicle = priorityVehicle(st, pl->load);
+					CanDeliver deliver = vehicle->request(pl->load, source, st);
+					int quantity = deliver.quantity;
+					if (quantity > pl->quantity)
+						quantity = pl->quantity;
+					vehicle->addCargo(pl->load, quantity, source, st);
+				}
+			}
+		}
+		// Визначаєм час наступної ітерації - коли треба буде везти наступний товар
+				// todo
+	}
 }

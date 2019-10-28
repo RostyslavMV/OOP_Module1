@@ -2,6 +2,7 @@
 #include "Load.h"
 #include "Storage.h"
 #include <vector>
+#include <cmath>
 
 using std::vector;
 
@@ -9,14 +10,25 @@ class Path
 {
 public:
 	int startTime;
+	double length;
 	vector <Storage*> storages;
 	Storage* last();
 	bool contains(Storage* storage);
+	Path(vector<Storage*> storages)
+	{
+		this->storages = storages;
+	}
+	Path(vector<Storage*> storages, double length)
+	{
+		this->storages = storages;
+		this->length = length;
+	}
 };
 
 class Cargo
 {
 public:
+	Cargo(Load* load, int quantity, Storage* sender, Storage* recipient);
 	Load* load;
 	int quantity;
 	Storage* sender;
@@ -36,6 +48,7 @@ public:
 	Path* path = nullptr;
 	Storage* waitingStorage;
 	CanDeliver request(Load* l, Storage* sender, Storage* recipient);
+	void addCargo(Load* l, int quantity, Storage* sender, Storage* recipient);
 protected:
 	vector<Cargo*> cargo;
 	double maxLoadVolume;

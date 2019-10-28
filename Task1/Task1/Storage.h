@@ -11,7 +11,13 @@ class Neighbor
 	Storage* storage;
 	double distance;
 public:
-	Neighbor(Storage* storage, double distance);
+	Neighbor(Storage* storage, double distance)
+	{
+		this->storage = storage;
+		this->distance = distance;
+	}
+	double Distance() { return distance; }
+	Storage* Storage() { return storage; }
 };
 
 class Storage
@@ -21,7 +27,7 @@ private:
 	double y;
 	int id;
 public:
-	Storage(int id, double x, double y);
+	Storage(double x, double y);
 	int Id() { return id; };
 	double X() { return this->x; }
 	double Y() { return this->y; }

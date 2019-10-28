@@ -10,10 +10,10 @@ public:
 };
 
 class PeriodicalLoad {
-	int increase;
-	int quantity = 0;
 public:
+	int increase;
 	PeriodicalLoad(Load* load, int period, int increase);
+	int quantity = 0;
 	int period;
 	Load* load;
 	int nextTime;

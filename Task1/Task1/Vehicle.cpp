@@ -41,6 +41,11 @@ CanDeliver Vehicle::request(Load* l, Storage* sender, Storage* recipient)
 	return CanDeliver(time, quantity);
 }
 
+void Vehicle::addCargo(Load* l, int quantity, Storage* sender, Storage* recipient)
+{
+	cargo.push_back(new Cargo(l, quantity, sender, recipient));
+}
+
 bool Vehicle::pathContainsStorage(Storage* storage)
 {
 	if (path != nullptr)
@@ -136,4 +141,12 @@ Storage* Path::last()
 bool Path::contains(Storage* storage)
 {
 	return std::find(storages.begin(), storages.end(), storage) != storages.end();
+}
+
+Cargo::Cargo(Load* load, int quantity, Storage* sender, Storage* recipient)
+{
+	this->load = load;
+	this->quantity = quantity;
+	this->sender = sender;
+	this->recipient = recipient;
 }

@@ -158,8 +158,6 @@
     <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AirVehicle.h" />
-    <ClInclude Include="GroundVehicle.h" />
     <ClInclude Include="Load.h" />
     <ClInclude Include="Logistics.h" />
     <ClInclude Include="Storage.h" />

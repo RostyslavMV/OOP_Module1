@@ -1,5 +1,3 @@
-#include "AirVehicle.h"
-#include "GroundVehicle.h"
 #include <iostream>
 #include "Logistics.h"
 

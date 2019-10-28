@@ -1,14 +1,10 @@
 #include "Storage.h"
 
-Neighbor::Neighbor(Storage* storage, double distance)
-{
-	this->storage = storage;
-	this->distance = distance;
-}
+int nextStorageId = 0;
 
-Storage::Storage(int id, double x, double y)
+Storage::Storage(double x, double y)
 {
-	this->id = id;
+	this->id = nextStorageId++;
 	this->x = x;
 	this->y = y;
 }
