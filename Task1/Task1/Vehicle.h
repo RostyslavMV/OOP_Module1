@@ -9,8 +9,6 @@ using std::vector;
 using std::string;
 using std::deque;
 
-Logistics logistic;
-
 class Path
 {
 public:
@@ -53,8 +51,9 @@ class Vehicle
 	double speed;
 	int loadTime;
 	int unloadTime;
-
+	// Path contains storage
 	bool pathContainsStorage(Storage* storage);
+	// Dispatch time from storage on path
 	int dispatchTime(Storage* storage);
 	Storage* lastStorage();
 
@@ -66,10 +65,8 @@ class Vehicle
 
 	// Ñheck if unloads on storage
 	bool unloading(Storage* storage);
-
 	// Ñheck if loads on storage
 	bool loading(Storage* storage);
-
 	// Remove cargo after unloading
 	void removeCargo(Storage* storage);
 public:

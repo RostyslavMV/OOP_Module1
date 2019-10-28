@@ -4,8 +4,8 @@
 
 int main()
 {
-	Logistics l;
-	l.load("data.txt");
-	l.simulate(100);
+	logistic.load("data.txt");
+	logistic.simulate(500);
+	logistic.outVehicles(1, 1, 1);
 }
 
