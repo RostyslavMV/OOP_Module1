@@ -1,5 +1,4 @@
 #include "Logistics.h"
-#include "Vehicle.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -8,11 +7,13 @@ using std::string;
 using std::cout;
 using std::vector;
 
-string getVal(string s, const char* key) {
-	int p1 = s.find(key, 0);
+Logistics logistic;
+
+string getVal(std::string s, const char* key) {
+	size_t p1 = s.find(key, 0);
 	p1 = s.find("=", p1);
 	p1++;
-	int p2 = s.find(";", p1);
+	size_t p2 = s.find(";", p1);
 	if (p2 == 0) p2 = s.length() - 1;
 	return s.substr(p1, p2 - p1);
 }
@@ -29,26 +30,75 @@ double getDbl(string s, const char* key) {
 	return ret;
 }
 
+double Logistics::distance(Storage* a, Storage* b, bool useAir)
+{
+	if (useAir)
+	{
+		double dX = a->X() - b->X();
+		double dY = a->Y() - b->Y();
+		return ceil(sqrt(dX * dX + dY * dY));
+	}
+	else return minDistances[a->Id()][b->Id()];
+}
+
 Storage* Logistics::storage(int id)
 {
-	std::vector<Storage*>::iterator it;
-	for (it = storages.begin(); it != storages.end(); it++)
+	for (Storage* s : storages)
 	{
-		if ((*it)->Id() == id)
-			return *it;
+		if (s->Id() == id)
+			return s;
 	}
 	return nullptr;
 }
 
 Load* Logistics::load(int type)
 {
-	vector<Load*>::iterator it;
-	for (it = loads.begin(); it != loads.end(); it++)
+	for (Load* l : loads)
 	{
-		if ((*it)->type == type)
-			return *it;
+		if (l->type == type)
+			return l;
 	}
 	return nullptr;
+}
+
+Storage* Logistics::priorityStorage(Load* load, Storage* recipient, int time)
+{
+	Storage* storage = nullptr;
+	double dist = DBL_MAX;
+	for (Storage* st : storages)
+	{
+		if (st->canOutload(load, time))
+		{
+			double d = logistic.distance(st, recipient, true);
+			if (d < dist)
+			{
+				dist = d;
+				storage = st;
+			}
+		}
+	}
+	return storage;
+}
+
+Vehicle* Logistics::priorityVehicle(Storage* sender, Storage* recipient, Load* load)
+{
+	int time = INT_MAX;
+	Vehicle* vehicle = nullptr;
+	double distAir = distance(sender, recipient, true);
+	double distGround = distance(sender, recipient, false);
+	for (Vehicle* v : vehicles)
+	{
+		DeliverRequest deliver = v->request(load, sender);
+		if (deliver.quantity > 0 && deliver.time < time)
+			vehicle = v;
+	}
+	return vehicle;
+}
+
+void Logistics::recalcVehicle(int time)
+{
+	for (Vehicle* v : vehicles)
+		v->recalc(time);
 }
 
 void Logistics::setGraph()
@@ -211,35 +261,93 @@ void Logistics::load(const char* fName)
 
 void Logistics::simulate(int endTime)
 {
-	vector<Storage*>::iterator stIt;
-	vector<PeriodicalLoad*>::iterator inloadIt;
 	int time = 0;
-	int nextTimeIter = endTime;
-	// Ітерації
-	while (nextTimeIter < endTime)
+	int nextTimeIter;
+	// Iterations
+	while (time < endTime)
 	{
-		// Проходимо по всіх складах
-		for (stIt = storages.begin(); stIt != storages.end(); stIt++)
+		// Recalculate Vehicles
+		recalcVehicle(time);
+		nextTimeIter = endTime;
+		// Iterate through all warehouses
+		for (Storage* st : storages)
 		{
-			Storage* st = *stIt;
-			// Всі вантажі які потрібно привести
-			for (inloadIt = st->inLoads.begin(); inloadIt != st->inLoads.end(); stIt++)
-			{
-				PeriodicalLoad* pl = *inloadIt;
-				while (pl->quantity != 0)
+			int nextInLoad = st->nextInLoadTime;
+			if (nextInLoad != -1)
+			{ // Storage produce cargo
+				if (nextInLoad == time) nextInLoad = endTime;
+				// All loads we need to deliver
+				for (PeriodicalLoad* pl : st->inLoads)
 				{
-					Storage* source = priorityStorage(pl->load);
-					if (source == nullptr) break; // Немає де взяти товар
-					Vehicle* vehicle = priorityVehicle(st, pl->load);
-					CanDeliver deliver = vehicle->request(pl->load, source, st);
-					int quantity = deliver.quantity;
-					if (quantity > pl->quantity)
-						quantity = pl->quantity;
-					vehicle->addCargo(pl->load, quantity, source, st);
+					while (pl->quantity != 0)
+					{
+						Storage* source = priorityStorage(pl->load, st, time);
+						if (source == nullptr) break; // Nowhere to take the loads
+						Vehicle* vehicle = priorityVehicle(source, st, pl->load);
+						if (!vehicle)
+						{
+							//cout << " no avialable vehicle: load " << pl->load->type << " from " << source->Id() << " to " << st->Id() << " qt " << pl->quantity << "\n";
+							break;
+						}
+						double dist = distance(source, st, vehicle->isAir());
+						DeliverRequest deliver = vehicle->request(pl->load, source);
+						int quantity = deliver.quantity;
+						if (quantity > pl->quantity)
+							quantity = pl->quantity;
+						vehicle->addCargo(pl->load, quantity, source, st);
+						vehicle->addPath(source, st, time);
+						std::cout << " time = " << time << " cargo: vehicle = " << vehicle->id << " load = " << pl->load->type << " quantity " << quantity << " from " << source->Id() << " to " << st->Id() << " path " << vehicle->path->toStr() << std::endl;
+						/*cout << "*** source free " << vehicle->freeVolume(source) << "\n";
+						cout << "*** dest free " << vehicle->freeVolume(st) << "\n";*/
+						pl->quantity -= quantity;
+					}
+					// When this storage will be nearest need for cargos
+					if (time + pl->nextTime < nextInLoad) nextInLoad = time + pl->nextTime;
 				}
+				st->nextInLoadTime = nextInLoad;
+				// When for all storages will be nearest need for cargos
+				if (nextTimeIter > nextInLoad)nextTimeIter = nextInLoad;
 			}
 		}
-		// Визначаєм час наступної ітерації - коли треба буде везти наступний товар
-				// todo
+		time = nextTimeIter;
 	}
+	cout << "simulation done\n";
+}
+
+bool compareByTime(const VehicleRequest& a, const VehicleRequest& b)
+{
+	if (a.quantity == 0 && b.quantity > 0) return false;
+	if (b.quantity == 0 && a.quantity > 0) return true;
+	return a.time < b.time;
+}
+
+void Logistics::outVehicles(int storageId, int loadType, int quantity)
+{
+	cout << "\n ======================================================== \n";
+	cout << " Vehicle list: \n\n";
+	Load* l = load(loadType);
+	if (l == nullptr)
+	{
+		cout << "loaad not found\n";
+		return;
+	}
+	Storage* s = storage(storageId);
+	if (s == nullptr)
+	{
+		cout << "storage not found\n";
+		return;
+	}
+	vector<VehicleRequest> res;
+	for (Vehicle* v : vehicles)
+	{
+		DeliverRequest request = v->request(l, s);
+		VehicleRequest vr;
+		vr.quantity = request.quantity;
+		vr.time = request.time;
+		vr.vehicle = v;
+		res.push_back(vr);
+	}
+	sort(res.begin(), res.end(), compareByTime);
+	for (VehicleRequest vr : res)
+		cout << " Vehicle: " << vr.vehicle->id << " time: " << vr.time << " quantity " << vr.quantity << "\n";
 }

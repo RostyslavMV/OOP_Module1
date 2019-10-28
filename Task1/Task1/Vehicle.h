@@ -95,3 +95,9 @@ public:
 	void recalc(int time);
 };
 
+struct VehicleRequest {
+public:
+	Vehicle* vehicle;
+	int time;
+	int quantity;
+};
