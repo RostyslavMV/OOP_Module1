@@ -2,27 +2,29 @@
 #include "Load.h"
 #include "Storage.h"
 #include <vector>
-#include <cmath>
+#include <string>
+#include <queue>
 
 using std::vector;
+using std::string;
+using std::deque;
+
+Logistics logistic;
 
 class Path
 {
 public:
+	// Absolute time, starting from first point of path
 	int startTime;
-	double length;
-	vector <Storage*> storages;
+	// Absolute time, starting from second point of path
+	int nextStartTime = -1;
+	// Absolute time of arrival
+	int finishTime = -1;
+
+	deque <Storage*> storages;
 	Storage* last();
 	bool contains(Storage* storage);
-	Path(vector<Storage*> storages)
-	{
-		this->storages = storages;
-	}
-	Path(vector<Storage*> storages, double length)
-	{
-		this->storages = storages;
-		this->length = length;
-	}
+	string toStr();
 };
 
 class Cargo
@@ -35,34 +37,61 @@ public:
 	Storage* recipient;
 };
 
-struct CanDeliver {
+struct DeliverRequest {
+public:
 	int time;
 	int quantity;
-public:
-	struct CanDeliver(int time, int quantity);
+	DeliverRequest(int time, int quantity);
 };
 
 class Vehicle
 {
-public:
-	Path* path = nullptr;
-	Storage* waitingStorage;
-	CanDeliver request(Load* l, Storage* sender, Storage* recipient);
-	void addCargo(Load* l, int quantity, Storage* sender, Storage* recipient);
-protected:
+	bool air;
 	vector<Cargo*> cargo;
 	double maxLoadVolume;
 	double maxLoadWeight;
-	int speed;
+	double speed;
 	int loadTime;
 	int unloadTime;
-	virtual int moveTime(Storage* from, Storage* to) = 0;
+
 	bool pathContainsStorage(Storage* storage);
 	int dispatchTime(Storage* storage);
 	Storage* lastStorage();
-	double freeVolume(Storage* storage);
+
+	// Free weight after unloading on storage
 	double freeWeight(Storage* storage);
+
+	// Free volume after unloading on storage
+	double freeVolume(Storage* storage);
+
+	// Ñheck if unloads on storage
 	bool unloading(Storage* storage);
+
+	// Ñheck if loads on storage
 	bool loading(Storage* storage);
+
+	// Remove cargo after unloading
+	void removeCargo(Storage* storage);
+public:
+	Vehicle(double maxVolume, double maxWeight, double speed, Storage* wStorage, int lTime, int uTime, bool air);
+	bool isAir() { return air; }
+	int id;
+	Path* path = new Path();
+
+	// Place of waiting when empty
+	Storage* waitingStorage;
+
+	// Possible time of arival on storage
+	int possibleTime(Storage* storage);
+
+	// Returns time of arival on storage and how much load it can deliver
+	DeliverRequest request(Load* l, Storage* storage);
+
+	// Add cargo for transportation
+	void addCargo(Load* l, int quantity, Storage* sender, Storage* recipient);
+	
+	// Add path of moving
+	void addPath(Storage* from, Storage* to, int time);
+	void recalc(int time);
 };
 

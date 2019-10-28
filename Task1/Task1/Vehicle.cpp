@@ -1,49 +1,84 @@
 #include "Vehicle.h"
 #include <iostream>
+#include "Logistics.h"
+#include <algorithm>
 
-using std::invalid_argument;
+int nextVehicleId = 1;
 
-CanDeliver::CanDeliver(int time, int quantity)
+DeliverRequest::DeliverRequest(int time, int quantity)
 {
 	this->time = time;
 	this->quantity = quantity;
 }
 
-CanDeliver Vehicle::request(Load* l, Storage* sender, Storage* recipient)
+Vehicle::Vehicle(double maxVolume, double maxWeight, double speed, Storage* wStorage, int lTime, int uTime, bool air)
 {
-	int time;
+	id = nextVehicleId++;
+	this->maxLoadVolume = maxVolume;
+	this->maxLoadWeight = maxWeight;
+	this->speed = speed;
+	this->waitingStorage = wStorage;
+	this->loadTime = lTime;
+	this->unloadTime = uTime;
+	this->air = air;
+}
+
+DeliverRequest Vehicle::request(Load* l, Storage* sender)
+{
 	int volumeQuantity;
 	int weightQuantity;
-	if (path == nullptr)
+	int time = possibleTime(sender);
+	if (pathContainsStorage(sender))
 	{
-		time = moveTime(waitingStorage, sender);
-		volumeQuantity = maxLoadVolume / l->volume;
-		weightQuantity = maxLoadWeight / l->weight;
-	}
-	else if (pathContainsStorage(sender))
-	{
-		time = dispatchTime(sender);
-		volumeQuantity = freeVolume(sender) / l->volume;
-		weightQuantity = freeWeight(sender) / l->weight;
+		volumeQuantity = (int)floor(freeVolume(sender) / l->volume);
+		weightQuantity = (int)floor(freeWeight(sender) / l->weight);
 	}
 	else
 	{
-		Storage* last = lastStorage();
-		time = dispatchTime(last) + moveTime(last, sender);
-		volumeQuantity = maxLoadVolume / l->volume;
-		weightQuantity = maxLoadWeight / l->weight;
+		volumeQuantity = (int)floor(maxLoadVolume / l->volume);
+		weightQuantity = (int)floor(maxLoadWeight / l->weight);
 	}
 	int quantity;
 	if (volumeQuantity < weightQuantity)
 		quantity = volumeQuantity;
 	else
 		quantity = weightQuantity;
-	return CanDeliver(time, quantity);
+	return DeliverRequest(time, quantity);
 }
 
 void Vehicle::addCargo(Load* l, int quantity, Storage* sender, Storage* recipient)
 {
 	cargo.push_back(new Cargo(l, quantity, sender, recipient));
+}
+
+void Vehicle::addPath(Storage* from, Storage* to, int time)
+{
+	if (path->storages.empty())
+		path->startTime = time;
+	if (path->last() != from)
+		path->storages.push_back(from);
+	path->storages.push_back(to);
+	path->nextStartTime = dispatchTime(path->storages[1]);
+}
+
+void Vehicle::recalc(int time)
+{
+	while (path->nextStartTime != -1 && path->nextStartTime <= time) // Remove passed path
+	{
+		if (path->storages.size() == 2) // Arrived at the end point
+		{
+			path->nextStartTime = -1;
+			path->storages.clear();
+			cargo.clear();
+		}
+		else
+		{
+			path->nextStartTime = dispatchTime(path->storages[1]);
+			Storage* st = path->storages[0];
+			removeCargo(st);
+			path->storages.erase(path->storages.begin());
+		}
+	}
 }
 
 bool Vehicle::pathContainsStorage(Storage* storage)
@@ -55,20 +90,20 @@ bool Vehicle::pathContainsStorage(Storage* storage)
 
 int Vehicle::dispatchTime(Storage* storage)
 {
-	if (path == nullptr || !path->contains(storage))
+	if (!path->contains(storage))
 	{
-		throw invalid_argument("error\n");
+		std::cout << "error\n";
 		return INT_MAX;
 	}
 	int time = 0;
-	std::vector<Storage*>::iterator it;
 	Storage* prev = nullptr;
-	for (it = path->storages.begin(); it != path->storages.end(); it++)
+
+	for (Storage* s : path->storages)
 	{
-		Storage* s = (*it);
 		if (unloading(s)) time += unloadTime;
 		if (loading(s)) time += loadTime;
-		if (prev) time += moveTime(prev, s);
+		if (prev) time += (int)ceil(logistic.distance(prev, s, air) / speed);
+		prev = s;
 		if (s == storage) break;
 	}
 	return path->startTime + time;
@@ -85,35 +120,63 @@ Storage* Vehicle::lastStorage()
 double Vehicle::freeVolume(Storage* storage)
 {
 	double v = 0;
-	std::vector<Cargo*>::iterator it;
-	for (it = cargo.begin(); it != cargo.end(); it++)
+	for (Cargo* c : cargo)
 	{
-		Cargo* c = (*it);
-		if (c->recipient == storage)
+		if (c->recipient != storage)
 			v += c->load->volume * c->quantity;
 	}
-	return maxLoadVolume - v;
+	if (v < maxLoadVolume)
+		return maxLoadVolume - v;
+	else
+		return 0;
+}
+
+int Vehicle::possibleTime(Storage* storage)
+{
+	int time = 0;
+	if (path->contains(storage))
+	{
+		Storage* prev = nullptr;
+		for (Storage* s : path->storages)
+		{
+			if (s == storage) break;
+			if (unloading(s)) time += unloadTime;
+			if (loading(s)) time += loadTime;
+			if (prev) time += (int)ceil(logistic.distance(prev, s, air) / speed);
+			prev = s;
+		}
+		return time;
+	}
+	else
+	{
+		Storage* last;
+		if (path->storages.empty())
+			last = waitingStorage;
+		else
+			last = path->last();
+		time = (int)ceil(logistic.distance(last, storage, air) / speed);
+	}
+	return time;
 }
 
 double Vehicle::freeWeight(Storage* storage)
 {
 	double w = 0;
-	std::vector<Cargo*>::iterator it;
-	for (it = cargo.begin(); it != cargo.end(); it++)
+	for (Cargo* c : cargo)
 	{
-		Cargo* c = (*it);
-		if (c->recipient == storage)
+		if (c->recipient != storage)
 			w += c->load->weight * c->quantity;
 	}
-	return maxLoadWeight - w;
+	if (w < maxLoadWeight)
+		return maxLoadWeight - w;
+	else
+		return 0;
 }
 
 bool Vehicle::unloading(Storage* storage)
 {
-	std::vector<Cargo*>::iterator it;
-	for (it = cargo.begin(); it != cargo.end(); it++)
+	for (Cargo* c : cargo)
 	{
-		Cargo* c = (*it);
 		if (c->recipient == storage)
 			return true;
 	}
@@ -122,25 +185,46 @@ bool Vehicle::unloading(Storage* storage)
 
 bool Vehicle::loading(Storage* storage)
 {
-	std::vector<Cargo*>::iterator it;
-	for (it = cargo.begin(); it != cargo.end(); it++)
+	for (Cargo* c : cargo)
 	{
-		Cargo* c = (*it);
 		if (c->sender == storage)
 			return true;
 	}
 	return false;
 }
 
+void Vehicle::removeCargo(Storage* storage)
+{
+	cargo.erase(std::remove_if(cargo.begin(), cargo.end(),
+		[storage](Cargo*& v)
+		{
+			return v->recipient == storage;
+		}), cargo.end());
+}
+
+
 Storage* Path::last()
 {
 	if (!storages.empty())
 		return storages.back();
+	return nullptr;
 }
 
 bool Path::contains(Storage* storage)
 {
 	return std::find(storages.begin(), storages.end(), storage) != storages.end();
+}
+
+string Path::toStr()
+{
+	string ret = "";
+	for (Storage* s : storages)
+	{
+		if (ret.length() != 0)
+			ret += " -> ";
+		ret += std::to_string(s->Id());
+	}
+	return ret;
 }
 
 Cargo::Cargo(Load* load, int quantity, Storage* sender, Storage* recipient)

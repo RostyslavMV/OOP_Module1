@@ -8,8 +8,7 @@ class Logistics
 	vector<vector<double>> graph;
 	vector<Storage*> storages;
 	vector<Load*> loads;
-	vector<Vehicle*> landVehicles;
-	vector<Vehicle*> airVehicles;
+	vector<Vehicle*> vehicles;
 
 	Storage* storage(int id);
 	Load* load(int type);
