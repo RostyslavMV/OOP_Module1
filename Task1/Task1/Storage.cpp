@@ -17,6 +17,8 @@ void Storage::addNeighbor(Storage* storage, double distance)
 void Storage::addInLoad(Load* load, int period, int quantity)
 {
 	inLoads.push_back(new PeriodicalLoad(load, period, quantity));
+	if (nextInLoadTime == -1 || nextInLoadTime < period)
+		nextInLoadTime = period;
 }
 
 void Storage::addOutLoad(Load* load, int period, int quantity)
@@ -40,4 +42,10 @@ bool Storage::canOutload(Load* load, int time)
 		}
 	}
 	return false;
+}
+
+Neighbor::Neighbor(Storage* storage, double distance)
+{
+	this->storage = storage;
+	this->distance = distance;
 }

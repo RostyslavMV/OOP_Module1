@@ -22,6 +22,7 @@ public:
 	deque <Storage*> storages;
 	Storage* last();
 	bool contains(Storage* storage);
+	bool contains(Storage* first, Storage* second);
 	string toStr();
 };
 
@@ -54,7 +55,7 @@ class Vehicle
 	// Path contains storage
 	bool pathContainsStorage(Storage* storage);
 	// Dispatch time from storage on path
-	int dispatchTime(Storage* storage);
+	int dispatchTime(Storage* storage, bool last);
 	Storage* lastStorage();
 
 	// Free weight after unloading on storage
@@ -79,10 +80,10 @@ public:
 	Storage* waitingStorage;
 
 	// Possible time of arival on storage
-	int possibleTime(Storage* storage);
+	int possibleTime(Storage* storage, int now);
 
 	// Returns time of arival on storage and how much load it can deliver
-	DeliverRequest request(Load* l, Storage* storage);
+	DeliverRequest request(Load* l, Storage* storage, int now);
 
 	// Add cargo for transportation
 	void addCargo(Load* l, int quantity, Storage* sender, Storage* recipient);

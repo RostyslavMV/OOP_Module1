@@ -23,11 +23,11 @@ Vehicle::Vehicle(double maxVolume, double maxWeight, double speed, Storage* wSto
 	this->air = air;
 }
 
-DeliverRequest Vehicle::request(Load* l, Storage* sender)
+DeliverRequest Vehicle::request(Load* l, Storage* sender, int now)
 {
 	int volumeQuantity;
 	int weightQuantity;
-	int time = possibleTime(sender);
+	int time = possibleTime(sender, now);
 	if (pathContainsStorage(sender))
 	{
 		volumeQuantity = (int)floor(freeVolume(sender) / l->volume);
@@ -54,18 +54,34 @@ void Vehicle::addCargo(Load* l, int quantity, Storage* sender, Storage* recipien
 void Vehicle::addPath(Storage* from, Storage* to, int time)
 {
 	if (path->storages.empty())
+	{
 		path->startTime = time;
-	if (path->last() != from)
 		path->storages.push_back(from);
-	path->storages.push_back(to);
-	path->nextStartTime = dispatchTime(path->storages[1]);
+		path->storages.push_back(to);
+		path->finishTime = dispatchTime(path->last(), true);
+		path->nextStartTime = path->finishTime;
+	}
+	else
+	{
+		if (!path->contains(from))
+		{
+			path->storages.push_back(from);
+			path->storages.push_back(to);
+		}
+		else
+			if (!path->contains(from, to))
+				path->storages.push_back(to);
+		path->finishTime = dispatchTime(path->last(), true);
+		if (path->nextStartTime > path->finishTime)
+			std::cout << "***error";
+	}
 }
 
 void Vehicle::recalc(int time)
 {
-	while (path->nextStartTime != -1 && path->nextStartTime <= time) // Remove passed path
+	while (path->nextStartTime != -1 && path->nextStartTime <= time) // Видаляєм пройдені маршрути
 	{
-		if (path->storages.size() == 2) // Arrived at the end point
+		if (path->storages.size() == 2) // прибули в кінцеву точку
 		{
 			path->nextStartTime = -1;
 			path->storages.clear();
@@ -73,7 +89,9 @@ void Vehicle::recalc(int time)
 		}
 		else
 		{
-			path->nextStartTime = dispatchTime(path->storages[1]);
+			int t = path->startTime;
+			path->nextStartTime = dispatchTime(path->storages[1], false);
+			path->startTime = t;
 			Storage* st = path->storages[0];
 			removeCargo(st);
 			path->storages.erase(path->storages.begin());
@@ -88,7 +106,7 @@ bool Vehicle::pathContainsStorage(Storage* storage)
 	return false;
 }
 
-int Vehicle::dispatchTime(Storage* storage)
+int Vehicle::dispatchTime(Storage* storage, bool last)
 {
 	if (!path->contains(storage))
 	{
@@ -104,7 +122,7 @@ int Vehicle::dispatchTime(Storage* storage)
 		if (loading(s)) time += loadTime;
 		if (prev) time += (int)ceil(logistic.distance(prev, s, air) / speed);
 		prev = s;
-		if (s == storage) break;
+		if (s == storage && !last) break;
 	}
 	return path->startTime + time;
 }
@@ -131,32 +149,41 @@ double Vehicle::freeVolume(Storage* storage)
 		return 0;
 }
 
-int Vehicle::possibleTime(Storage* storage)
+int Vehicle::possibleTime(Storage* storage, int now)
 {
-	int time = 0;
+	int time;
 	if (path->contains(storage))
 	{
+		time = path->startTime;
 		Storage* prev = nullptr;
 		for (Storage* s : path->storages)
 		{
-			if (s == storage) break;
+			if (s == storage && path->nextStartTime < now)
+				break;
 			if (unloading(s)) time += unloadTime;
 			if (loading(s)) time += loadTime;
 			if (prev) time += (int)ceil(logistic.distance(prev, s, air) / speed);
 			prev = s;
 		}
-		return time;
 	}
 	else
 	{
 		Storage* last;
 		if (path->storages.empty())
+		{
 			last = waitingStorage;
+			time = now;
+		}
 		else
+		{
 			last = path->last();
-		time = (int)ceil(logistic.distance(last, storage, air) / speed);
+			time = path->finishTime;
+		}
+		time += (int)ceil(logistic.distance(last, storage, air) / speed);
 	}
-	return time;
+	if (time < now)
+		time = now; 
+	return time;;
 }
 
 double Vehicle::freeWeight(Storage* storage)
@@ -213,6 +240,22 @@ Storage* Path::last()
 bool Path::contains(Storage* storage)
 {
 	return std::find(storages.begin(), storages.end(), storage) != storages.end();
+}
+
+bool Path::contains(Storage* first, Storage* second)
+{
+	bool firstFound = false;
+	for (Storage* s : storages)
+	{
+		if (firstFound)
+		{
+			if (s == second) return true;
+		}
+		else
+			if (s == first)
+				firstFound = true;
+	}
+	return false;
 }
 
 string Path::toStr()

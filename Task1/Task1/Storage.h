@@ -8,16 +8,10 @@ class Storage;
 
 class Neighbor
 {
+public:
+	Neighbor(Storage* storage, double distance);
 	Storage* storage;
 	double distance;
-public:
-	Neighbor(Storage* storage, double distance)
-	{
-		this->storage = storage;
-		this->distance = distance;
-	}
-	double Distance() { return distance; }
-	Storage* Storage() { return storage; }
 };
 
 class Storage

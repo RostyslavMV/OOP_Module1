@@ -5,7 +5,9 @@
 int main()
 {
 	logistic.load("data.txt");
-	logistic.simulate(500);
-	logistic.outVehicles(1, 1, 1);
+
+	int endTime = 500;
+	logistic.simulate(endTime);
+	logistic.outVehicles(endTime, 1, 1, 1);
 }
 

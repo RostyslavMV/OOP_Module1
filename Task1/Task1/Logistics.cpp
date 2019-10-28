@@ -26,7 +26,7 @@ int getInt(string s, const char* key) {
 
 double getDbl(string s, const char* key) {
 	string ss = getVal(s, key);
-	int ret = std::stof(ss);
+	double ret = std::stof(ss);
 	return ret;
 }
 
@@ -80,7 +80,7 @@ Storage* Logistics::priorityStorage(Load* load, Storage* recipient, int time)
 	return storage;
 }
 
-Vehicle* Logistics::priorityVehicle(Storage* sender, Storage* recipient, Load* load)
+Vehicle* Logistics::priorityVehicle(Storage* sender, Storage* recipient, Load* load, int now)
 {
 	int time = INT_MAX;
 	Vehicle* vehicle = nullptr;
@@ -88,7 +88,7 @@ Vehicle* Logistics::priorityVehicle(Storage* sender, Storage* recipient, Load* l
 	double distGround = distance(sender, recipient, false);
 	for (Vehicle* v : vehicles)
 	{
-		DeliverRequest deliver = v->request(load, sender);
+		DeliverRequest deliver = v->request(load, sender, now);
 		if (deliver.quantity > 0 && deliver.time < time)
 			vehicle = v;
 	}
@@ -104,17 +104,17 @@ void Logistics::recalcVehicle(int time)
 void Logistics::setGraph()
 {
 	graph.clear();
-	for (int i = 0; i < storages.size(); i++)
+	for (size_t i = 0; i < storages.size(); i++)
 	{
 		graph.push_back(vector<double>(storages.size(), 0));
 		minDistances.push_back(vector<double>(storages.size(), 0));
 	}
-	for (int i = 0; i < storages.size(); i++)
+	for (size_t i = 0; i < storages.size(); i++)
 	{
-		for (int j = 0; j < storages[i]->neighbores.size(); j++)
+		for (size_t j = 0; j < storages[i]->neighbores.size(); j++)
 		{
-			double distance = storages[i]->neighbores[j]->Distance();
-			int index = storages[i]->neighbores[j]->Storage()->Id();
+			double distance = storages[i]->neighbores[j]->distance;
+			int index = storages[i]->neighbores[j]->storage->Id();
 			graph[i][index] = distance;
 		}
 	}
@@ -123,7 +123,7 @@ void Logistics::setGraph()
 double Logistics::minDistance(vector<double>& dist, vector<bool>& sptSet)
 {
 	double min = DBL_MAX, minIndex;
-	for (int v = 0; v < dist.size(); v++)
+	for (size_t v = 0; v < dist.size(); v++)
 		if (sptSet[v] == false && dist[v] <= min)
 			min = dist[v], minIndex = v;
 	return minIndex;
@@ -132,18 +132,18 @@ double Logistics::minDistance(vector<double>& dist, vector<bool>& sptSet)
 void Logistics::dijkstra()
 {
 	setGraph();
-	for (int src = 0; src < storages.size(); src++)
+	for (size_t src = 0; src < storages.size(); src++)
 	{
 		vector<bool> sptSet;
 		sptSet.resize(graph.size());
-		for (int i = 0; i < graph.size(); i++)
+		for (size_t i = 0; i < graph.size(); i++)
 			minDistances[src][i] = DBL_MAX, sptSet[i] = false;
 		minDistances[src][src] = 0;
-		for (int count = 0; count < graph.size() - 1; count++)
+		for (size_t count = 0; count < graph.size() - 1; count++)
 		{
 			int u = minDistance(minDistances[src], sptSet);
 			sptSet[u] = true;
-			for (int v = 0; v < graph.size(); v++)
+			for (size_t v = 0; v < graph.size(); v++)
 				if (!sptSet[v] && graph[u][v] && minDistances[src][u] != DBL_MAX
 					&& minDistances[src][u] + graph[u][v] < minDistances[src][v])
 					minDistances[src][v] = minDistances[src][u] + graph[u][v];
@@ -269,48 +269,48 @@ void Logistics::simulate(int endTime)
 		// Recalculate Vehicles
 		recalcVehicle(time);
 		nextTimeIter = endTime;
-		// Iterate through all warehouses
+		// Iterate through storages
 		for (Storage* st : storages)
 		{
 			int nextInLoad = st->nextInLoadTime;
 			if (nextInLoad != -1)
-			{ // Storage produce cargo
+			{ // Storage provides load
 				if (nextInLoad == time) nextInLoad = endTime;
-				// All loads we need to deliver
+				// All loads, that need delivering
 				for (PeriodicalLoad* pl : st->inLoads)
 				{
 					while (pl->quantity != 0)
 					{
 						Storage* source = priorityStorage(pl->load, st, time);
-						if (source == nullptr) break; // Nowhere to take the loads
-						Vehicle* vehicle = priorityVehicle(source, st, pl->load);
+						if (source == nullptr) break; // No loads
+						Vehicle* vehicle = priorityVehicle(source, st, pl->load, time);
 						if (!vehicle)
 						{
 							//cout << " no avialable vehicle: load " << pl->load->type << " from " << source->Id() << " to " << st->Id() << " qt " << pl->quantity << "\n";
 							break;
 						}
 						double dist = distance(source, st, vehicle->isAir());
-						DeliverRequest deliver = vehicle->request(pl->load, source);
+						DeliverRequest deliver = vehicle->request(pl->load, source, time);
 						int quantity = deliver.quantity;
 						if (quantity > pl->quantity)
 							quantity = pl->quantity;
 						vehicle->addCargo(pl->load, quantity, source, st);
 						vehicle->addPath(source, st, time);
+						//if (vehicle->id == 4)
 						std::cout << " time = " << time << " cargo: vehicle = " << vehicle->id << " load = " << pl->load->type << " quantity " << quantity << " from " << source->Id() << " to " << st->Id() << " path " << vehicle->path->toStr() << std::endl;
-						/*cout << "*** source free " << vehicle->freeVolume(source) << "\n";
-						cout << "*** dest free " << vehicle->freeVolume(st) << "\n";*/
 						pl->quantity -= quantity;
 					}
-					// When this storage will be nearest need for cargos
+					// Nearest need for load for storage
 					if (time + pl->nextTime < nextInLoad) nextInLoad = time + pl->nextTime;
 				}
 				st->nextInLoadTime = nextInLoad;
-				// When for all storages will be nearest need for cargos
+				// Nearest need for load for all storages
 				if (nextTimeIter > nextInLoad)nextTimeIter = nextInLoad;
 			}
 		}
 		time = nextTimeIter;
 	}
+	recalcVehicle(endTime);
 	cout << "simulation done\n";
 }
 
@@ -321,7 +321,7 @@ bool compareByTime(const VehicleRequest& a, const VehicleRequest& b)
 	return a.time < b.time;
 }
 
-void Logistics::outVehicles(int storageId, int loadType, int quantity)
+void Logistics::outVehicles(int time, int storageId, int loadType, int quantity)
 {
 	cout << "\n ======================================================== \n";
 	cout << " Vehicle list: \n\n";
@@ -340,14 +340,16 @@ void Logistics::outVehicles(int storageId, int loadType, int quantity)
 	vector<VehicleRequest> res;
 	for (Vehicle* v : vehicles)
 	{
-		DeliverRequest request = v->request(l, s);
+		//	if (v->id == 3) {
+		DeliverRequest request = v->request(l, s, time);
 		VehicleRequest vr;
 		vr.quantity = request.quantity;
 		vr.time = request.time;
 		vr.vehicle = v;
 		res.push_back(vr);
+		//}
 	}
 	sort(res.begin(), res.end(), compareByTime);
 	for (VehicleRequest vr : res)
-		cout << " Vehicle: " << vr.vehicle->id << " time: " << vr.time << " quantity " << vr.quantity << "\n";
+		cout << " Vehicle: " << vr.vehicle->id << " time: " << vr.time - time << " quantity " << vr.quantity << "\n";
 }
