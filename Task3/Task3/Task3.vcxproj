@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Alpha.cpp" />
+    <ClCompile Include="Base.cpp" />
     <ClCompile Include="Base1.cpp" />
     <ClCompile Include="Base2.cpp" />
     <ClCompile Include="Beta.cpp" />

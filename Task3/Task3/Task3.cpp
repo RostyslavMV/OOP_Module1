@@ -19,13 +19,13 @@ int main()
 	for (int i = 0; i < 10; i++)
 	{
 		base1elems.push_back(shared_ptr<Alpha>(new Alpha()));
-		base1elems[base1elems.size() - 1].setUseCount(base1elems[base1elems.size() - 1].use_count);
+		base1elems[base1elems.size() - 1]->setUseCount(base1elems[base1elems.size() - 1].use_count());
 		base1elems.push_back(shared_ptr<Beta>(new Beta()));
-		base1elems[base1elems.size() - 1].setUseCount(base1elems[base1elems.size() - 1].use_count);
+		base1elems[base1elems.size() - 1]->setUseCount(base1elems[base1elems.size() - 1].use_count());
 		base2elems.push_back(shared_ptr<Gamma>(new Gamma()));
-		base2elems[base2elems.size() - 1].setUseCount(base2elems[base2elems.size() - 1].use_count);
+		base2elems[base2elems.size() - 1]->setUseCount(base2elems[base2elems.size() - 1].use_count());
 		base2elems.push_back(shared_ptr<Delta>(new Delta()));
-		base2elems[base2elems.size() - 1].setUseCount(base2elems[base2elems.size() - 1].use_count);
+		base2elems[base2elems.size() - 1]->setUseCount(base2elems[base2elems.size() - 1].use_count());
 	}
 	cout << "Predicted S = " << predictor1.predictS(base1elems) << endl;
 	while (!base1elems.empty())
