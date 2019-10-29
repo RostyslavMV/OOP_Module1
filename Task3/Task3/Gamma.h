@@ -6,5 +6,6 @@ class Gamma :
 public:
 	Gamma();
 	~Gamma();
+	int Schange(int currS) override;
 };
 

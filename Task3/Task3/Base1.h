@@ -1,18 +1,14 @@
 #pragma once
 #include "Global.h"
-#include <memory>
+#include "Base.h"
+#include "Base2.h"
 
-using std::shared_ptr;
-
-class Base2;
-
-class Base1
+class Base1: public Base
 {
 protected:
 	static int count;
-	shared_ptr<Base1> base1;
-	shared_ptr<Base2> base2;	
 public:
+	virtual int Schange(int currS) = 0;
 	int N = 1;
 	virtual ~Base1();
 };

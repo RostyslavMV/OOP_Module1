@@ -6,5 +6,6 @@ class Delta :
 public:
 	Delta();
 	~Delta();
+	int Schange(int currS) override;
 };
 

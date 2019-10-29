@@ -162,12 +162,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Alpha.h" />
+    <ClInclude Include="Base.h" />
     <ClInclude Include="Base1.h" />
     <ClInclude Include="Base2.h" />
     <ClInclude Include="Beta.h" />
     <ClInclude Include="Delta.h" />
     <ClInclude Include="Gamma.h" />
     <ClInclude Include="Global.h" />
+    <ClInclude Include="Predictor.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,5 +6,6 @@ class Alpha :
 public:
 	Alpha();
 	~Alpha();
+	int Schange(int currS) override;
 };
 

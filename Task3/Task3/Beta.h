@@ -6,5 +6,6 @@ class Beta :
 public:
 	Beta();
 	~Beta();
+	int Schange(int currS) override;
 };
 
