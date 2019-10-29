@@ -157,6 +157,7 @@
     <ClCompile Include="Beta.cpp" />
     <ClCompile Include="Delta.cpp" />
     <ClCompile Include="Gamma.cpp" />
+    <ClCompile Include="Global.cpp" />
     <ClCompile Include="Task3.cpp" />
   </ItemGroup>
   <ItemGroup>

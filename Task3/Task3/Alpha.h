@@ -4,6 +4,7 @@ class Alpha :
 	public Base1
 {
 public:
+	Alpha();
 	~Alpha();
 };
 

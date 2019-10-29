@@ -4,6 +4,7 @@ class Delta :
 	public Base2
 {
 public:
+	Delta();
 	~Delta();
 };
 

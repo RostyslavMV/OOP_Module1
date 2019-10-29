@@ -4,6 +4,7 @@ class Gamma :
 	public Base2
 {
 public:
+	Gamma();
 	~Gamma();
 };
 

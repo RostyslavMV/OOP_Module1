@@ -1,3 +1,3 @@
 #pragma once
 
-int S = 1;
+extern int S;
