@@ -1,5 +1,5 @@
 # OOP_Module1
-Approximate time taken (understanding task, coding, debuging):
+Approximate time taken (understanding task, coding, debugging):
 
 Task 1 - 12:30
 
